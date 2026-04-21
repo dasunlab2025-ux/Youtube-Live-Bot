@@ -1,0 +1,29 @@
+name: Daily YouTube Vertical Live
+
+on:
+  schedule:
+    # ලංකාවේ වෙලාවෙන් රාත්‍රී 8:00 ට (UTC 14:30)
+    - cron: '30 14 * * *' 
+  workflow_dispatch: # අපිට අවශ්‍ය වෙලාවක ටෙස්ට් කරන්න (Manual Run)
+
+jobs:
+  live-stream:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install FFmpeg & gdown
+        run: |
+          sudo apt update
+          sudo apt install ffmpeg -y
+          pip install gdown
+
+      - name: Download Video from Google Drive
+        run: |
+          # ඔයාගේ Drive ලින්ක් එකෙන් ගත්ත ID එක
+          gdown --id 1xw_xpBe0WxU3EXmSG6vC11XqHUb1tUqI -O video.mp4
+
+      - name: Start Streaming to YouTube (1 Hour)
+        env:
+          STREAM_KEY: ${{ secrets.YOUTUBE_STREAM_KEY }}
+        run: |
+          # පැය 1ක (තත්පර 3600) ලයිව් එකක්
+          ffmpeg -re -stream_loop -1 -i video.mp4 -c:v copy -c:a aac -t 3600 -f flv rtmp://a.rtmp.youtube.com/live2/$STREAM_KEY
