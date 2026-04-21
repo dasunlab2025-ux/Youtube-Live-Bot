@@ -2,7 +2,8 @@ name: Daily YouTube Vertical Live
 
 on:
   schedule:
-    - cron: '30 14 * * *' 
+    # ලංකාවේ වෙලාවෙන් දවල් 1:30 ට (UTC 08:00)
+    - cron: '0 8 * * *' 
   workflow_dispatch: 
 
 jobs:
@@ -17,11 +18,12 @@ jobs:
 
       - name: Download Video from Google Drive
         run: |
-          # --id කමාන්ඩ් එක ඉවත් කර කෙලින්ම ID එක ලබා දී ඇත
-          gdown 1xw_xpBe0WxU3EXmSG6vC11XqHUb1tUqI -O video.mp4
+          # දැන් ID එක එන්නේ Repository Variable එකකින් (Live Controller එක හරහා)
+          gdown ${{ vars.DRIVE_FILE_ID }} -O video.mp4
 
-      - name: Start Streaming to YouTube (1 Hour)
+      - name: Start Streaming to YouTube (1 Hour & 4 Seconds)
         env:
           STREAM_KEY: ${{ secrets.YOUTUBE_STREAM_KEY }}
         run: |
-          ffmpeg -re -stream_loop -1 -i video.mp4 -c:v copy -c:a aac -t 3600 -f flv rtmp://a.rtmp.youtube.com/live2/$STREAM_KEY
+          # -t 3604 මගින් පැයයි තත්පර 4ක කාලයක් ලබා දෙයි
+          ffmpeg -re -stream_loop -1 -i video.mp4 -c:v copy -c:a aac -t 3604 -f flv rtmp://a.rtmp.youtube.com/live2/$STREAM_KEY
