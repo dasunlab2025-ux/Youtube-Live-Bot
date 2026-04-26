@@ -25,5 +25,5 @@ jobs:
         env:
           STREAM_KEY: ${{ secrets.YOUTUBE_STREAM_KEY }}
         run: |
-          # -t 3604 මගින් පැයයි තත්පර 4ක කාලයක් ලබා දෙයි
+          # -t 18000 මගින් පැයයි තත්පර 4ක කාලයක් ලබා දෙයි
           ffmpeg -re -stream_loop -1 -i video.mp4 -c:v copy -c:a aac -t 3604 -f flv rtmp://a.rtmp.youtube.com/live2/$STREAM_KEY
