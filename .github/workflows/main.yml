@@ -3,7 +3,7 @@ name: Daily YouTube Vertical Live
 on:
   schedule:
     # ලංකාවේ වෙලාවෙන් දවල් 1:30 ට (UTC 08:00)
-    - cron: '0 8 * * *' 
+    - cron: '0 8 * * *'
   workflow_dispatch: 
 
 jobs:
@@ -18,12 +18,19 @@ jobs:
 
       - name: Download Video from Google Drive
         run: |
-          # ඔබ ලබා දුන් ලින්ක් එකේ ID එක මෙතැනට ඇතුළත් කර ඇත
-          gdown 1sCa7kmo5Z9uLxiEG2j1HlKonBdOFgAUC -O video.mp4
+          # අලුත් Google Drive Video ID එක මෙතැනට දමා ඇත
+          gdown 1pu8wVW-UqY55Evvv2J0lXQJKa9j47J4p -O video.mp4
 
-      - name: Start Streaming to YouTube (1 Hour & 12 Minutes)
+      - name: Start Streaming to YouTube (2 Hours & 14 Minutes)
         env:
           STREAM_KEY: ${{ secrets.YOUTUBE_STREAM_KEY }}
         run: |
-          # -t 4320 මගින් පැය 1 යි විනාඩි 12 ක කාලයක් ලබා දෙයි
-          ffmpeg -re -stream_loop -1 -i video.mp4 -c:v copy -c:a aac -t 4320 -f flv rtmp://a.rtmp.youtube.com/live2/$STREAM_KEY
+          # -t 8040 මගින් පැය 2 යි විනාඩි 14 ක කාලයක් ලබා දෙයි
+          # vf filter එකෙන් 4:5 වීඩියෝ එක 1080x1920 (9:16) Frame එකක් මැදට ලස්සනට පෑඩ් (Pad) කරයි
+          ffmpeg -re -stream_loop -1 -i video.mp4 \
+            -vf "scale=1080:1350,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:black" \
+            -c:v libx264 -preset ultrafast -tune zerolatency -b:v 2500k -g 60 \
+            -c:a aac -b:a 128k -ar 44100 \
+            -t 8040 \
+            -flvflags no_duration_filesize \
+            -f flv "rtmp://a.rtmp.youtube.com/live2/$STREAM_KEY"
