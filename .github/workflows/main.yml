@@ -26,9 +26,9 @@ jobs:
           STREAM_KEY: ${{ secrets.YOUTUBE_STREAM_KEY }}
         run: |
           # -t 8040 මගින් පැය 2 යි විනාඩි 14 ක කාලයක් ලබා දෙයි
-          # vf filter එකෙන් 4:5 වීඩියෝ එක 1080x1920 (9:16) Frame එකක් මැදට ලස්සනට පෑඩ් (Pad) කරයි
+          # vf filter එක මගින් වීඩියෝව සම්පූර්ණ 9:16 (1080x1920) තිරයටම පිරෙන සේ සකසයි (කළු තීරු නොමැත)
           ffmpeg -re -stream_loop -1 -i video.mp4 \
-            -vf "scale=1080:1350,pad=1080:1920:(ow-iw)/2:(oh-ih)/2:black" \
+            -vf "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920" \
             -c:v libx264 -preset ultrafast -tune zerolatency -b:v 2500k -g 60 \
             -c:a aac -b:a 128k -ar 44100 \
             -t 8040 \
