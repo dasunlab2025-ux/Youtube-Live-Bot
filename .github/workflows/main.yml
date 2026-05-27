@@ -14,12 +14,12 @@ jobs:
         run: |
           sudo apt update
           sudo apt install ffmpeg -y
-          pip install gdown
+          pip install gdown --break-system-packages
 
       - name: Download Video from Google Drive
         run: |
           # අලුත් Google Drive Video ID එක මෙතැනට දමා ඇත
-          gdown 1pu8wVW-UqY55Evvv2J0lXQJKa9j47J4p -O video.mp4
+          gdown 1lZhH4zORk-XbdL1tY8f-oGkTl72tT2Kb -O video.mp4
 
       - name: Start Streaming to YouTube (2 Hours & 14 Minutes)
         env:
