@@ -1,0 +1,1351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Ronaldo vs Messi: Live Spin Game!</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Rajdhani:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --pitch-dark:#07211a;
+    --pitch:#0c3a29;
+    --pitch-light:#17a55a;
+    --gold:#f2b705;
+    --gold-soft:#ffd85c;
+    --chalk:#f5f7f0;
+    --messi-blue:#6cb4ee;
+    --messi-blue-deep:#3f7fbd;
+    --ronaldo-red:#e6362a;
+    --ronaldo-red-deep:#a91f17;
+    --cr7-color:#ff6a5b;
+    --lm10-color:#5be3ff;
+    --ink:#08150f;
+    --line: rgba(245,247,240,0.14);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0; height:100%;
+    background:#000;
+    font-family:'Manrope',sans-serif;
+    color:var(--chalk);
+    overflow:hidden;
+  }
+
+  .letterbox{
+    width:100vw; height:100dvh;
+    display:flex; align-items:center; justify-content:center;
+    background:#000;
+  }
+
+  .frame{
+    position:relative;
+    width:min(100vw, 100dvh * 9 / 16);
+    height:min(100dvh, 100vw * 16 / 9);
+    container-type: size;
+    overflow:hidden;
+    background:
+      radial-gradient(ellipse 140% 60% at 50% -8%, var(--pitch) 0%, var(--pitch-dark) 55%, var(--ink) 100%);
+  }
+
+  .stripes{
+    position:absolute; inset:0; z-index:0; opacity:0.32;
+    background:repeating-linear-gradient(
+      100deg,
+      rgba(255,255,255,0.03) 0px,
+      rgba(255,255,255,0.03) 60px,
+      transparent 60px,
+      transparent 120px
+    );
+  }
+  /* slowed + softened so the backdrop reads as calm rather than busy — keeps viewers comfortable during long live sessions */
+  .lights{ position:absolute; inset:0; z-index:0; pointer-events:none; }
+  .lights span{
+    position:absolute; width:45cqh; height:45cqh; border-radius:50%;
+    filter:blur(10cqh); opacity:0.22; animation:drift 26s ease-in-out infinite alternate;
+  }
+  .lights span:nth-child(1){background:var(--pitch-light); top:-10%; left:-15%;}
+  .lights span:nth-child(2){background:var(--gold); bottom:-6%; right:-18%; animation-delay:5s;}
+  .lights span:nth-child(3){background:var(--messi-blue); top:30%; right:-20%; animation-delay:11s;}
+  .lights span:nth-child(4){background:var(--ronaldo-red); bottom:20%; left:-20%; animation-delay:17s;}
+  @keyframes drift{ from{transform:translate(0,0) scale(1);} to{transform:translate(2cqw,-2cqh) scale(1.1);} }
+
+  .vignette{
+    position:absolute; inset:0; z-index:0; pointer-events:none;
+    background:radial-gradient(ellipse 90% 80% at 50% 45%, transparent 55%, rgba(0,0,0,0.45) 100%);
+  }
+  .grain{
+    position:absolute; inset:0; z-index:0; pointer-events:none; opacity:0.045;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .stage{
+    position:relative; z-index:1;
+    width:100%; height:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:space-between;
+    padding:3.2cqh 4cqw 3cqh;
+  }
+
+  header{
+    display:flex; flex-direction:column; align-items:center; gap:0.9cqh;
+    text-align:center;
+    flex-shrink:0;
+  }
+  .live-badge{
+    display:inline-flex; align-items:center; gap:1.2cqw;
+    background:rgba(230,54,42,0.16);
+    border:1px solid rgba(230,54,42,0.55);
+    color:#ff8b81;
+    font-family:'Rajdhani',sans-serif;
+    font-weight:700; letter-spacing:0.16em;
+    font-size:2.4cqh;
+    padding:0.8cqh 3.2cqw;
+    border-radius:999px;
+  }
+  .live-dot{
+    width:1.5cqh;height:1.5cqh;border-radius:50%; background:#ff4438;
+    animation:pulse-dot 1.8s infinite;
+  }
+  @keyframes pulse-dot{
+    0%{box-shadow:0 0 0 0 rgba(255,68,56,0.6);}
+    70%{box-shadow:0 0 0 1.4cqh rgba(255,68,56,0);}
+    100%{box-shadow:0 0 0 0 rgba(255,68,56,0);}
+  }
+  h1{
+    font-family:'Anton',sans-serif; font-weight:400;
+    font-size:6.6cqh; letter-spacing:0.01em; margin:0; line-height:0.98;
+    background:linear-gradient(180deg,#ffffff 10%, var(--gold-soft) 55%, var(--gold) 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    text-shadow:0 1cqh 5cqh rgba(242,183,5,0.22);
+  }
+  .subtitle{
+    font-family:'Rajdhani',sans-serif; font-weight:700;
+    letter-spacing:0.24em; text-transform:uppercase;
+    font-size:2.5cqh; color:var(--gold-soft);
+  }
+
+  .wheel-zone{
+    position:relative;
+    width:60cqw;
+    max-width:58cqh;
+    aspect-ratio:1/1;
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .bulb-ring{ position:absolute; inset:-2.2cqh; border-radius:50%; }
+  .bulb{
+    position:absolute; width:1.5cqh; height:1.5cqh; border-radius:50%;
+    background:var(--gold-soft); top:50%; left:50%; transform-origin:0 0;
+    box-shadow:0 0 1cqh 0.4cqh rgba(242,183,5,0.3);
+    opacity:0.35;
+    transition:opacity 0.28s ease, box-shadow 0.28s ease;
+  }
+  .bulb.lit{ opacity:1; box-shadow:0 0 2cqh 0.7cqh rgba(255,216,92,0.9); }
+
+  .pointer{
+    position:absolute; top:-1cqh; left:50%; transform:translateX(-50%);
+    width:0; height:0;
+    border-left:2.4cqh solid transparent;
+    border-right:2.4cqh solid transparent;
+    border-top:3.8cqh solid var(--gold);
+    filter:drop-shadow(0 0.6cqh 0.8cqh rgba(0,0,0,0.5));
+    z-index:5;
+  }
+  .pointer::after{
+    content:""; position:absolute; top:-4.4cqh; left:-0.8cqh;
+    width:1.6cqh;height:1.6cqh;border-radius:50%; background:var(--gold);
+  }
+
+  .wheel-outer{
+    position:relative; width:88%; aspect-ratio:1/1; border-radius:50%;
+    background:conic-gradient(from 0deg, var(--gold), var(--gold-soft));
+    padding:1.5cqh;
+    animation: idleGlow 4.5s ease-in-out infinite;
+  }
+  @keyframes idleGlow{
+    0%,100%{ box-shadow:0 3cqh 7.5cqh -1.5cqh rgba(0,0,0,0.6), inset 0 0 0 0.3cqh rgba(255,255,255,0.18), 0 0 3cqh rgba(242,183,5,0.12);}
+    50%{ box-shadow:0 3cqh 7.5cqh -1.5cqh rgba(0,0,0,0.6), inset 0 0 0 0.3cqh rgba(255,255,255,0.3), 0 0 6cqh rgba(242,183,5,0.3);}
+  }
+  .wheel{
+    position:relative; width:100%; height:100%; border-radius:50%; overflow:hidden;
+    background:var(--pitch-dark); /* replaced by JS with a conic-gradient built from SEGMENTS */
+    box-shadow:inset 0 0 4cqh rgba(0,0,0,0.6);
+    will-change:transform;
+  }
+  /* Each wheel-label is a full-size layer rotated to the middle of its slice.
+     The inner <span> sits near the rim (padding-top) so the text reads radially, like a classic prize wheel. */
+  .wheel-label{
+    position:absolute; inset:0;
+    display:flex; justify-content:center;
+    padding-top:9%;
+    pointer-events:none;
+  }
+  .wheel-label span{
+    display:inline-block;
+    width:max-content;
+    max-width:36%;
+    text-align:center;
+    font-family:'Rajdhani',sans-serif;
+    font-weight:700;
+    font-size:2.5cqh;
+    letter-spacing:0.02em;
+    text-transform:uppercase;
+    text-shadow:0 0.3cqh 0.5cqh rgba(0,0,0,0.55);
+    line-height:1.08;
+    white-space:nowrap;
+    word-break:keep-all;
+    overflow-wrap:normal;
+  }
+
+  .hub{
+    position:absolute; top:50%; left:50%; width:19%; height:19%;
+    transform:translate(-50%,-50%); border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #fff, var(--gold) 55%, var(--gold-soft) 100%);
+    box-shadow:0 0 0 0.6cqh var(--pitch-dark), 0 1cqh 2cqh rgba(0,0,0,0.5);
+    z-index:4; display:flex; align-items:center; justify-content:center;
+  }
+  .hub svg{width:44%;height:44%;}
+
+  .match-row{
+    display:flex; align-items:center; justify-content:center;
+    gap:4cqw; width:100%; flex-shrink:0;
+  }
+  .player-card{
+    --accent: var(--chalk);
+    position:relative;
+    width:37cqw;
+    border-radius:2.2cqh;
+    padding:1.6cqh 2cqw 1.8cqh;
+    background:linear-gradient(165deg, rgba(255,255,255,0.06), rgba(255,255,255,0.015));
+    border:1px solid var(--line);
+    display:flex; flex-direction:column; align-items:center; gap:1.1cqh;
+    transition:transform 0.4s cubic-bezier(.2,.8,.3,1), box-shadow 0.4s ease;
+  }
+  .player-card.left{--accent:var(--ronaldo-red);}
+  .player-card.right{--accent:var(--messi-blue);}
+  .player-card::before{
+    content:""; position:absolute; inset:0; border-radius:2.2cqh; padding:1px;
+    background:linear-gradient(160deg, var(--accent), transparent 60%);
+    -webkit-mask:linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude; opacity:0.55; pointer-events:none;
+  }
+  .player-card.winning{
+    transform:translateY(-0.6cqh) scale(1.045);
+    box-shadow:0 2.2cqh 5.5cqh -1.6cqh var(--accent), 0 0 0 1px var(--accent);
+  }
+
+  .jersey-wrap{ position:relative; width:10.2cqh; height:10.2cqh; display:flex; align-items:center; justify-content:center; }
+  .jersey-glow{
+    position:absolute; inset:-1.3cqh; border-radius:50%;
+    background:radial-gradient(circle, var(--accent) 0%, transparent 70%);
+    opacity:0.26; filter:blur(0.6cqh);
+  }
+  .jersey{
+    position:relative;
+    width:9.4cqh; height:9.4cqh; border-radius:50%;
+    background:
+      radial-gradient(circle at 32% 28%, rgba(255,255,255,0.35), transparent 45%),
+      linear-gradient(155deg, var(--accent), color-mix(in srgb, var(--accent) 55%, #050b08));
+    display:flex; align-items:center; justify-content:center;
+    box-shadow: inset 0 0.2cqh 1cqh rgba(255,255,255,0.25), inset 0 -1cqh 2cqh rgba(0,0,0,0.35), 0 0.8cqh 2cqh rgba(0,0,0,0.45);
+    border:0.3cqh solid rgba(255,255,255,0.15);
+    overflow:hidden;
+  }
+  .jersey .num{
+    font-family:'Anton',sans-serif; font-size:4.3cqh; color:rgba(255,255,255,0.95);
+    text-shadow:0 0.3cqh 0.6cqh rgba(0,0,0,0.4);
+  }
+  /* Optional player photo slot — hidden until a photo URL is supplied via
+     PLAYER_PHOTOS in the script below. Falls back to the jersey number. */
+  .player-photo{
+    position:absolute; inset:0; width:100%; height:100%;
+    object-fit:cover; border-radius:50%;
+    display:none;
+  }
+  .jersey.has-photo .num{ display:none; }
+  .jersey.has-photo .player-photo{ display:block; }
+
+  .player-name{
+    font-family:'Rajdhani',sans-serif; font-weight:700;
+    font-size:2.4cqh; letter-spacing:0.03em; text-transform:uppercase;
+    text-align:center; color:var(--chalk);
+  }
+  .player-tag{
+    font-size:1.4cqh; letter-spacing:0.16em; text-transform:uppercase;
+    color:rgba(245,247,240,0.45); margin-top:-0.7cqh;
+  }
+
+  .score-box{
+    display:flex; flex-direction:column; align-items:center; gap:0.2cqh;
+    padding-top:0.6cqh; border-top:1px dashed var(--line); width:100%;
+  }
+  .score-label{ font-size:1.3cqh; letter-spacing:0.22em; text-transform:uppercase; color:rgba(245,247,240,0.4); }
+  .score-value{
+    font-family:'Rajdhani',sans-serif; font-weight:700;
+    font-size:6.2cqh; line-height:1; color:var(--accent);
+    text-shadow:0 0 2.4cqh color-mix(in srgb, var(--accent) 60%, transparent);
+    font-variant-numeric:tabular-nums;
+    transition:text-shadow 0.4s ease;
+  }
+  .score-value.bump{ animation:bump 0.6s cubic-bezier(.32,1.5,.4,1); }
+  @keyframes bump{ 0%{transform:scale(1);} 38%{transform:scale(1.32);} 100%{transform:scale(1);} }
+
+  /* ---------- Manual controls: hidden during a real broadcast, add ?controls=1 to the URL to reveal for setup/testing ---------- */
+  .controls{ display:none; flex-direction:column; align-items:center; gap:1.4cqh; flex-shrink:0; }
+  .controls.visible{ display:flex; }
+  .spin-btn{
+    font-family:'Anton',sans-serif; font-size:3cqh; letter-spacing:0.05em;
+    color:var(--ink);
+    background:linear-gradient(180deg, var(--gold-soft), var(--gold));
+    border:none; padding:1.8cqh 7cqw; border-radius:1.6cqh; cursor:pointer;
+    box-shadow:0 1cqh 0 var(--ronaldo-red-deep), 0 1.8cqh 3.6cqh rgba(0,0,0,0.4);
+    transition:transform 0.12s ease, box-shadow 0.12s ease, opacity 0.2s ease;
+  }
+  .spin-btn:active:not(:disabled){
+    transform:translateY(0.7cqh);
+    box-shadow:0 0.3cqh 0 var(--ronaldo-red-deep), 0 0.6cqh 1.2cqh rgba(0,0,0,0.4);
+  }
+  .spin-btn:disabled{ opacity:0.55; cursor:not-allowed; }
+  .utility-row{ display:flex; gap:1.4cqw; flex-wrap:wrap; justify-content:center; }
+  .ghost-btn{
+    font-family:'Rajdhani',sans-serif; font-weight:600; letter-spacing:0.08em; text-transform:uppercase;
+    font-size:1.6cqh; color:rgba(245,247,240,0.7);
+    background:transparent; border:1px solid var(--line);
+    padding:0.9cqh 2.4cqw; border-radius:999px; cursor:pointer; transition:all 0.2s ease;
+  }
+  .ghost-btn:hover{ border-color:var(--gold); color:var(--gold-soft); }
+
+  /* ---------- Result overlay ---------- */
+  .result-overlay{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+    pointer-events:none; z-index:50; padding:0 5cqw;
+    background:rgba(0,0,0,0);
+    transition:background 0.4s ease;
+  }
+  .result-overlay.dim{ background:rgba(0,0,0,0.5); }
+  .result-text{
+    display:flex; flex-direction:column; align-items:center; gap:0.6cqh;
+    opacity:0;
+    transform:scale(0.4) rotate(-4deg);
+    padding:2.4cqh 6cqw;
+    background:linear-gradient(160deg, rgba(7,20,15,0.85), rgba(7,20,15,0.6));
+    border:1px solid rgba(255,255,255,0.2);
+    /* Clipped/cut corners so the popup reads as a badge rather than floating bare text. */
+    clip-path:polygon(2.6cqh 0, 100% 0, 100% calc(100% - 2.6cqh), calc(100% - 2.6cqh) 100%, 0 100%, 0 2.6cqh);
+    box-shadow:0 2cqh 5cqh rgba(0,0,0,0.5);
+  }
+  .result-text.show{ animation:pop-in 0.9s cubic-bezier(.2,1.6,.3,1) forwards, hold-glow 1.6s ease-in-out 0.9s; }
+  .result-main{
+    font-family:'Anton',sans-serif; font-size:7.4cqh; text-align:center; letter-spacing:0.01em;
+    text-shadow:0 1.4cqh 5cqh rgba(0,0,0,0.6);
+    -webkit-text-stroke:0.22cqh rgba(0,0,0,0.25);
+  }
+  .result-sub-line{
+    font-family:'Rajdhani',sans-serif; font-weight:700; letter-spacing:0.12em; text-transform:uppercase;
+    font-size:2cqh; color:rgba(245,247,240,0.85);
+    text-shadow:0 0.4cqh 1cqh rgba(0,0,0,0.6);
+  }
+  @keyframes pop-in{
+    0%{opacity:0; transform:scale(0.3) rotate(-8deg);}
+    55%{opacity:1; transform:scale(1.1) rotate(2deg);}
+    75%{transform:scale(0.97) rotate(-1deg);}
+    100%{opacity:1; transform:scale(1) rotate(0deg);}
+  }
+  @keyframes hold-glow{ 0%,100%{filter:drop-shadow(0 0 1.6cqh currentColor);} 50%{filter:drop-shadow(0 0 3.2cqh currentColor);} }
+  .result-fade{ animation:fade-out 0.6s ease forwards; }
+  @keyframes fade-out{ to{opacity:0; transform:scale(0.85) translateY(-2cqh);} }
+  .result-messi .result-main{color:var(--messi-blue);}
+  .result-ronaldo .result-main{color:var(--ronaldo-red);}
+  .result-sub .result-main{color:var(--gold);}
+  .result-cr7 .result-main{color:var(--cr7-color);}
+  .result-lm10 .result-main{color:var(--lm10-color);}
+
+  .sub-callout{
+    position:absolute; bottom:2.6cqh; left:50%;
+    transform:translateX(-50%) translateY(140%);
+    display:flex; align-items:center; gap:1.4cqw;
+    background:linear-gradient(135deg,#ff4438,#c9251c);
+    padding:1.3cqh 4cqw; border-radius:999px;
+    font-family:'Rajdhani',sans-serif; font-weight:700; letter-spacing:0.06em; text-transform:uppercase;
+    font-size:2cqh;
+    box-shadow:0 1.6cqh 4cqh rgba(230,54,42,0.5);
+    z-index:60; transition:transform 0.6s cubic-bezier(.2,1.3,.35,1);
+    white-space:nowrap;
+  }
+  .sub-callout.show{ transform:translateX(-50%) translateY(0); }
+  .sub-callout svg{ width:2.2cqh; height:2.2cqh; flex-shrink:0; }
+
+  /* ---------- Series scoreboard (top of screen) ---------- */
+  .series-bar{
+    display:flex; align-items:center; gap:0.9cqw;
+    background:rgba(7,33,26,0.72);
+    border:1px solid var(--line);
+    -webkit-backdrop-filter:blur(0.6cqh); backdrop-filter:blur(0.6cqh);
+    padding:0.7cqh 2.6cqw; border-radius:999px;
+    font-family:'Rajdhani',sans-serif; font-weight:700; letter-spacing:0.08em; text-transform:uppercase;
+    font-size:1.9cqh; white-space:nowrap;
+    box-shadow:0 0.6cqh 1.6cqh rgba(0,0,0,0.35);
+    flex-shrink:0;
+  }
+  .series-bar .series-label{ color:rgba(245,247,240,0.55); font-size:1.5cqh; letter-spacing:0.18em; }
+  .series-bar .series-ronaldo{ color:var(--ronaldo-red-deep); color:#ff8b81; }
+  .series-bar .series-messi{ color:var(--messi-blue); }
+  .series-bar .series-num{ font-family:'Anton',sans-serif; font-weight:400; font-size:2.4cqh; padding:0 0.2cqw; }
+
+  /* ---------- Full-screen match-win celebration ---------- */
+  .match-win-overlay{
+    position:absolute; inset:0; z-index:90;
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none;
+    background:radial-gradient(ellipse 90% 70% at 50% 40%, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.82) 100%);
+    transition:opacity 0.4s ease;
+    overflow:hidden;
+  }
+  .match-win-overlay.show{ opacity:1; }
+  .win-rays{
+    position:absolute; inset:-20%; z-index:0;
+    background:conic-gradient(from 0deg,
+      rgba(242,183,5,0.28) 0deg, transparent 14deg,
+      transparent 22deg, rgba(242,183,5,0.28) 32deg,
+      transparent 46deg, transparent 54deg, rgba(242,183,5,0.28) 64deg,
+      transparent 78deg, transparent 86deg, rgba(242,183,5,0.28) 96deg,
+      transparent 110deg, transparent 118deg, rgba(242,183,5,0.28) 128deg,
+      transparent 142deg, transparent 150deg, rgba(242,183,5,0.28) 160deg,
+      transparent 174deg, transparent 182deg, rgba(242,183,5,0.28) 192deg,
+      transparent 206deg, transparent 214deg, rgba(242,183,5,0.28) 224deg,
+      transparent 238deg, transparent 246deg, rgba(242,183,5,0.28) 256deg,
+      transparent 270deg, transparent 278deg, rgba(242,183,5,0.28) 288deg,
+      transparent 302deg, transparent 310deg, rgba(242,183,5,0.28) 320deg,
+      transparent 334deg, transparent 342deg, rgba(242,183,5,0.28) 352deg, transparent 360deg);
+    animation: spin-rays 12s linear infinite;
+  }
+  @keyframes spin-rays{ from{transform:rotate(0deg);} to{transform:rotate(360deg);} }
+  .win-content{
+    position:relative; z-index:2;
+    display:flex; flex-direction:column; align-items:center; gap:1.4cqh;
+    transform:scale(0.6); opacity:0;
+  }
+  .match-win-overlay.show .win-content{
+    animation:win-pop 0.8s cubic-bezier(.2,1.6,.3,1) forwards;
+  }
+  @keyframes win-pop{
+    0%{transform:scale(0.4) rotate(-6deg); opacity:0;}
+    60%{transform:scale(1.15) rotate(2deg); opacity:1;}
+    100%{transform:scale(1) rotate(0deg); opacity:1;}
+  }
+  .win-trophy{ font-size:11cqh; line-height:1; filter:drop-shadow(0 0 3cqh rgba(242,183,5,0.7)); }
+  .win-title{
+    font-family:'Anton',sans-serif; font-size:6.4cqh; text-align:center; letter-spacing:0.01em;
+    -webkit-text-stroke:0.18cqh rgba(0,0,0,0.3);
+    text-shadow:0 1cqh 4cqh rgba(0,0,0,0.6);
+  }
+  .win-title.ronaldo-win{ color:var(--ronaldo-red); }
+  .win-title.messi-win{ color:var(--messi-blue); }
+  .win-sub{
+    font-family:'Rajdhani',sans-serif; font-weight:700; letter-spacing:0.2em; text-transform:uppercase;
+    font-size:2.4cqh; color:var(--gold-soft);
+  }
+  .win-flash{
+    position:absolute; inset:0; z-index:1; pointer-events:none;
+    background:radial-gradient(ellipse 60% 50% at 50% 45%, rgba(255,255,255,0.5), transparent 70%);
+    opacity:0; animation:win-flash-pulse 0.9s ease-out 1;
+  }
+  @keyframes win-flash-pulse{ 0%{opacity:0.9;} 100%{opacity:0;} }
+
+  /* ---------- Subscribe hype: full-screen flashing overlay ---------- */
+  .sub-hype-overlay{
+    position:absolute; inset:0; z-index:88;
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none;
+    overflow:hidden;
+  }
+  .sub-hype-overlay.show{ opacity:1; animation:sub-bg-flash 0.5s steps(1,end) infinite; }
+  @keyframes sub-bg-flash{
+    0%,100%{ background:rgba(242,183,5,0.16); }
+    50%{ background:rgba(230,54,42,0.16); }
+  }
+  .sub-hype-content{
+    display:flex; flex-direction:column; align-items:center; gap:1.2cqh;
+    transform:scale(0.7); opacity:0;
+  }
+  .sub-hype-overlay.show .sub-hype-content{
+    animation:sub-pop 0.6s cubic-bezier(.2,1.6,.3,1) forwards;
+  }
+  @keyframes sub-pop{
+    0%{transform:scale(0.5); opacity:0;}
+    60%{transform:scale(1.18); opacity:1;}
+    100%{transform:scale(1); opacity:1;}
+  }
+  .sub-hype-bell{
+    width:13cqh; height:13cqh; color:var(--gold-soft);
+    filter:drop-shadow(0 0 2.6cqh rgba(242,183,5,0.85));
+    animation:bell-shake 0.5s ease-in-out infinite;
+    transform-origin:50% 15%;
+  }
+  @keyframes bell-shake{
+    0%,100%{transform:rotate(0deg) scale(1);}
+    20%{transform:rotate(-14deg) scale(1.05);}
+    40%{transform:rotate(12deg) scale(1.05);}
+    60%{transform:rotate(-9deg) scale(1.05);}
+    80%{transform:rotate(7deg) scale(1.05);}
+  }
+  .sub-hype-title{
+    font-family:'Anton',sans-serif; font-size:7cqh; letter-spacing:0.02em; text-align:center;
+    color:var(--gold-soft);
+    -webkit-text-stroke:0.16cqh rgba(0,0,0,0.35);
+    animation:sub-title-flash 0.5s steps(1,end) infinite;
+  }
+  @keyframes sub-title-flash{
+    0%,100%{ color:var(--gold-soft); }
+    50%{ color:#ffffff; }
+  }
+  .sub-hype-sub{
+    font-family:'Rajdhani',sans-serif; font-weight:700; letter-spacing:0.16em; text-transform:uppercase;
+    font-size:2.3cqh; color:#fff;
+  }
+  .sub-hype-rays{
+    position:absolute; inset:-30%; z-index:0;
+    background:conic-gradient(from 0deg,
+      rgba(255,255,255,0.14) 0deg, transparent 10deg,
+      transparent 20deg, rgba(255,255,255,0.14) 30deg,
+      transparent 40deg, transparent 50deg, rgba(255,255,255,0.14) 60deg,
+      transparent 70deg, transparent 80deg, rgba(255,255,255,0.14) 90deg,
+      transparent 100deg, transparent 110deg, rgba(255,255,255,0.14) 120deg,
+      transparent 130deg, transparent 140deg, rgba(255,255,255,0.14) 150deg,
+      transparent 160deg, transparent 170deg, rgba(255,255,255,0.14) 180deg,
+      transparent 190deg, transparent 200deg, rgba(255,255,255,0.14) 210deg,
+      transparent 220deg, transparent 230deg, rgba(255,255,255,0.14) 240deg,
+      transparent 250deg, transparent 260deg, rgba(255,255,255,0.14) 270deg,
+      transparent 280deg, transparent 290deg, rgba(255,255,255,0.14) 300deg,
+      transparent 310deg, transparent 320deg, rgba(255,255,255,0.14) 330deg,
+      transparent 340deg, transparent 350deg, rgba(255,255,255,0.14) 360deg);
+    animation: spin-rays 4s linear infinite;
+  }
+
+  /* ---------- Hot streak fire overlay ---------- */
+  .streak-overlay{
+    position:absolute; left:0; right:0; top:38%; z-index:70;
+    display:flex; align-items:center; justify-content:center;
+    pointer-events:none;
+    opacity:0; transform:scale(0.7) translateY(1cqh);
+  }
+  .streak-overlay.show{
+    animation:streak-in-out 2.6s cubic-bezier(.2,1.3,.3,1) forwards;
+  }
+  @keyframes streak-in-out{
+    0%{opacity:0; transform:scale(0.6) translateY(1.5cqh);}
+    14%{opacity:1; transform:scale(1.08) translateY(0);}
+    22%{transform:scale(1) translateY(0);}
+    82%{opacity:1; transform:scale(1) translateY(0);}
+    100%{opacity:0; transform:scale(0.92) translateY(-1cqh);}
+  }
+  .streak-text{
+    font-family:'Anton',sans-serif; font-size:5.2cqh; letter-spacing:0.02em; text-align:center;
+    padding:1cqh 5cqw; border-radius:1.6cqh;
+    background:linear-gradient(160deg, rgba(255,90,20,0.24), rgba(120,10,0,0.24));
+    border:1px solid rgba(255,150,60,0.5);
+    text-shadow:0 0 2.4cqh rgba(255,120,20,0.9), 0 0.4cqh 0.8cqh rgba(0,0,0,0.6);
+    background-image:linear-gradient(180deg,#fff6d8 0%, #ffb23c 45%, #ff5a1e 80%, #d92a0a 100%);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    animation:flame-flicker 0.4s ease-in-out infinite alternate;
+  }
+  @keyframes flame-flicker{
+    0%{ filter:drop-shadow(0 0 1.6cqh rgba(255,120,20,0.7)); }
+    100%{ filter:drop-shadow(0 0 3cqh rgba(255,60,10,0.95)); }
+  }
+
+  /* ---------- Live commenter ticker ---------- */
+  .comment-ticker{
+    width:100%; flex-shrink:0; margin-top:1.4cqh;
+    display:flex; align-items:center; gap:1cqw;
+    background:rgba(7,33,26,0.55);
+    border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+    border-radius:1cqh;
+    padding:0.9cqh 0; overflow:hidden;
+  }
+  .comment-ticker-icon{
+    flex-shrink:0; margin-left:2.6cqw;
+    font-size:1.8cqh;
+  }
+  .comment-ticker-mask{
+    position:relative; flex:1; overflow:hidden; height:2.6cqh;
+  }
+  .comment-ticker-track{
+    position:absolute; top:0; left:0; white-space:nowrap;
+    display:inline-block;
+    font-family:'Rajdhani',sans-serif; font-weight:600; letter-spacing:0.04em;
+    font-size:1.8cqh; color:rgba(245,247,240,0.85);
+    animation: ticker-scroll 18s linear infinite;
+  }
+  @keyframes ticker-scroll{
+    from{ transform:translateX(100%); }
+    to{ transform:translateX(-100%); }
+  }
+
+  /* ---------- Top commenter spotlight (every 2 minutes) ---------- */
+  .top-commenter-overlay{
+    position:absolute; inset:0; z-index:89;
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; pointer-events:none;
+    background:radial-gradient(ellipse 90% 70% at 50% 40%, rgba(20,10,35,0.72) 0%, rgba(5,3,12,0.88) 100%);
+    transition:opacity 0.4s ease;
+    overflow:hidden;
+  }
+  .top-commenter-overlay.show{ opacity:1; }
+  .tc-rays{
+    position:absolute; inset:-20%; z-index:0;
+    background:conic-gradient(from 0deg,
+      rgba(190,140,255,0.24) 0deg, transparent 16deg,
+      transparent 26deg, rgba(242,183,5,0.22) 36deg,
+      transparent 52deg, transparent 62deg, rgba(190,140,255,0.24) 72deg,
+      transparent 88deg, transparent 98deg, rgba(242,183,5,0.22) 108deg,
+      transparent 124deg, transparent 134deg, rgba(190,140,255,0.24) 144deg,
+      transparent 160deg, transparent 170deg, rgba(242,183,5,0.22) 180deg,
+      transparent 196deg, transparent 206deg, rgba(190,140,255,0.24) 216deg,
+      transparent 232deg, transparent 242deg, rgba(242,183,5,0.22) 252deg,
+      transparent 268deg, transparent 278deg, rgba(190,140,255,0.24) 288deg,
+      transparent 304deg, transparent 314deg, rgba(242,183,5,0.22) 324deg,
+      transparent 340deg, transparent 350deg, rgba(190,140,255,0.24) 360deg);
+    animation: spin-rays 14s linear infinite reverse;
+  }
+  .tc-content{
+    position:relative; z-index:2;
+    display:flex; flex-direction:column; align-items:center; gap:1cqh;
+    transform:scale(0.6); opacity:0;
+    padding:0 6cqw;
+  }
+  .top-commenter-overlay.show .tc-content{
+    animation:win-pop 0.8s cubic-bezier(.2,1.6,.3,1) forwards;
+  }
+  .tc-crown{ font-size:9cqh; line-height:1; filter:drop-shadow(0 0 2.6cqh rgba(242,183,5,0.7)); }
+  .tc-label{
+    font-family:'Rajdhani',sans-serif; font-weight:700; letter-spacing:0.24em; text-transform:uppercase;
+    font-size:2.2cqh; color:rgba(245,247,240,0.7);
+  }
+  .tc-name{
+    font-family:'Anton',sans-serif; font-size:6.4cqh; text-align:center; letter-spacing:0.01em;
+    color:var(--gold-soft);
+    -webkit-text-stroke:0.16cqh rgba(0,0,0,0.35);
+    text-shadow:0 1cqh 4cqh rgba(0,0,0,0.6);
+    word-break:break-word;
+    max-width:100%;
+  }
+  .tc-count{
+    font-family:'Rajdhani',sans-serif; font-weight:700; letter-spacing:0.1em; text-transform:uppercase;
+    font-size:2cqh; color:#fff;
+  }
+
+  canvas#confetti{ position:absolute; inset:0; pointer-events:none; z-index:40; }
+
+  @media (prefers-reduced-motion: reduce){
+    .lights span{animation:none;}
+    .live-dot{animation:none;}
+    .wheel-outer{animation:none;}
+    .win-rays, .sub-hype-rays, .tc-rays{animation:none;}
+    .sub-hype-overlay.show{animation:none;}
+    .sub-hype-title{animation:none;}
+    .sub-hype-bell{animation:none;}
+    .streak-text{animation:none;}
+    .comment-ticker-track{animation:none;}
+  }
+</style>
+</head>
+<body>
+
+<div class="letterbox">
+  <div class="frame" id="frame">
+    <div class="stripes"></div>
+    <div class="lights"><span></span><span></span><span></span><span></span></div>
+    <div class="vignette"></div>
+    <div class="grain"></div>
+    <canvas id="confetti"></canvas>
+
+    <div class="streak-overlay" id="streakOverlay">
+      <div class="streak-text" id="streakText"></div>
+    </div>
+
+    <div class="stage">
+
+      <header>
+        <div class="series-bar" id="seriesBar">
+          <span class="series-label">Series:</span>
+          <span class="series-ronaldo">Ronaldo</span>
+          <span class="series-num series-ronaldo" id="seriesRonaldo">0</span>
+          <span class="series-label">-</span>
+          <span class="series-num series-messi" id="seriesMessi">0</span>
+          <span class="series-messi">Messi</span>
+        </div>
+        <h1>Ronaldo vs Messi</h1>
+        <span class="subtitle">Live Spin Game!</span>
+      </header>
+
+      <div class="wheel-zone">
+        <div class="pointer"></div>
+        <div class="bulb-ring" id="bulbRing"></div>
+        <div class="wheel-outer">
+          <div class="wheel" id="wheel"><!-- segment slices + labels are generated by JS from the SEGMENTS array --></div>
+        </div>
+        <div class="hub">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 2L14.5 9H21.8L15.9 13.3L18.2 20.5L12 16L5.8 20.5L8.1 13.3L2.2 9H9.5L12 2Z" fill="#0a1410"/></svg>
+        </div>
+      </div>
+
+      <div class="match-row">
+        <div class="player-card left" id="card-ronaldo">
+          <div class="jersey-wrap">
+            <div class="jersey-glow"></div>
+            <div class="jersey" id="jersey-ronaldo"><span class="num">7</span><img class="player-photo" id="photo-ronaldo" alt="Ronaldo"></div>
+          </div>
+          <div class="player-name">Ronaldo</div>
+          <div class="player-tag">Team Red</div>
+          <div class="score-box">
+            <span class="score-label">Points</span>
+            <span class="score-value" id="score-ronaldo">0</span>
+          </div>
+        </div>
+
+        <div class="player-card right" id="card-messi">
+          <div class="jersey-wrap">
+            <div class="jersey-glow"></div>
+            <div class="jersey" id="jersey-messi"><span class="num">10</span><img class="player-photo" id="photo-messi" alt="Messi"></div>
+          </div>
+          <div class="player-name">Messi</div>
+          <div class="player-tag">Team Blue</div>
+          <div class="score-box">
+            <span class="score-label">Points</span>
+            <span class="score-value" id="score-messi">0</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="comment-ticker" id="commentTicker">
+        <span class="comment-ticker-icon">💬</span>
+        <div class="comment-ticker-mask">
+          <div class="comment-ticker-track" id="commentTickerTrack">Waiting for live chat…</div>
+        </div>
+      </div>
+
+      <!-- Hidden on the live broadcast. Add ?controls=1 to the URL while you're setting up to reveal these. -->
+      <div class="controls" id="controls">
+        <button class="spin-btn" id="spinBtn">SPIN THE WHEEL</button>
+        <div class="utility-row">
+          <button class="ghost-btn" id="resetBtn">Reset Scores</button>
+          <button class="ghost-btn" id="soundBtn">🔊 Sound On</button>
+          <span class="ghost-btn" id="wsStatus" style="pointer-events:none;">Votes: default 50/50</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="result-overlay" id="resultOverlay"></div>
+    <div class="sub-callout" id="subCallout">
+      <svg viewBox="0 0 24 24" fill="white"><path d="M12 2C7 2 3 5.6 3 10c0 3.4 2.4 6.3 5.8 7.5L8 22l4.4-2.6c.2 0 .4 0 .6 0 5 0 9-3.6 9-8s-4-8-9-8z"/></svg>
+      Smash that Subscribe button!
+    </div>
+
+    <div class="match-win-overlay" id="matchWinOverlay">
+      <div class="win-rays"></div>
+      <div class="win-flash" id="winFlash"></div>
+      <div class="win-content">
+        <div class="win-trophy">🏆</div>
+        <div class="win-title" id="winTitle"></div>
+        <div class="win-sub" id="winSub"></div>
+      </div>
+    </div>
+
+    <div class="sub-hype-overlay" id="subHypeOverlay">
+      <div class="sub-hype-rays"></div>
+      <div class="sub-hype-content">
+        <svg class="sub-hype-bell" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C7 2 3 5.6 3 10c0 3.4 2.4 6.3 5.8 7.5L8 22l4.4-2.6c.2 0 .4 0 .6 0 5 0 9-3.6 9-8s-4-8-9-8z"/></svg>
+        <div class="sub-hype-title">SUBSCRIBE NOW!</div>
+        <div class="sub-hype-sub">Don't miss the next spin</div>
+      </div>
+    </div>
+
+    <div class="top-commenter-overlay" id="topCommenterOverlay">
+      <div class="tc-rays"></div>
+      <div class="tc-content">
+        <div class="tc-crown">👑</div>
+        <div class="tc-label">Top Commenter — Last 2 Min</div>
+        <div class="tc-name" id="tcName"></div>
+        <div class="tc-count" id="tcCount"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const frame = document.getElementById('frame');
+  const wheel = document.getElementById('wheel');
+  const spinBtn = document.getElementById('spinBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const soundBtn = document.getElementById('soundBtn');
+  const controlsEl = document.getElementById('controls');
+  const resultOverlay = document.getElementById('resultOverlay');
+  const subCallout = document.getElementById('subCallout');
+  const bulbRing = document.getElementById('bulbRing');
+  const wsStatus = document.getElementById('wsStatus');
+
+  const scoreEls = { messi: document.getElementById('score-messi'), ronaldo: document.getElementById('score-ronaldo') };
+  const cardEls  = { messi: document.getElementById('card-messi'), ronaldo: document.getElementById('card-ronaldo') };
+
+  const seriesRonaldoEl = document.getElementById('seriesRonaldo');
+  const seriesMessiEl = document.getElementById('seriesMessi');
+  const matchWinOverlay = document.getElementById('matchWinOverlay');
+  const winFlash = document.getElementById('winFlash');
+  const winTitle = document.getElementById('winTitle');
+  const winSub = document.getElementById('winSub');
+  const subHypeOverlay = document.getElementById('subHypeOverlay');
+  const streakOverlay = document.getElementById('streakOverlay');
+  const streakText = document.getElementById('streakText');
+  const commentTickerTrack = document.getElementById('commentTickerTrack');
+  const topCommenterOverlay = document.getElementById('topCommenterOverlay');
+  const tcName = document.getElementById('tcName');
+  const tcCount = document.getElementById('tcCount');
+
+  // ------------------------------------------------------------------
+  // PLAYER PHOTOS (optional, visual only) — paste in your own licensed
+  // photo URLs (or base64 data URIs) to show a photo instead of the
+  // jersey number. Leave the strings blank to keep showing the number.
+  // We can't source or embed Ronaldo's/Messi's actual photos ourselves
+  // (they're copyrighted), but any photo you have the rights to use
+  // drops in here with one line each.
+  // ------------------------------------------------------------------
+const PLAYER_PHOTOS = {
+  ronaldo: 'https://i.postimg.cc/rpwSgCMB/Gemini-Generated-Image-3cuu7h3cuu7h3cuu.png', // ඔයාගේ photo link/URL එක මෙතන දාන්න
+  messi: 'https://i.postimg.cc/26qnNkqd/Gemini-Generated-Image-q3ejkhq3ejkhq3ej.png',
+};
+  function applyPlayerPhotos(){
+    Object.entries(PLAYER_PHOTOS).forEach(([key, url])=>{
+      if(!url) return;
+      const jerseyEl = document.getElementById(`jersey-${key}`);
+      const imgEl = document.getElementById(`photo-${key}`);
+      if(jerseyEl && imgEl){
+        imgEl.src = url;
+        jerseyEl.classList.add('has-photo');
+      }
+    });
+  }
+  applyPlayerPhotos();
+
+  // Reveal manual controls only when explicitly requested (useful while you're testing the scene in OBS).
+  if (new URLSearchParams(location.search).has('controls')) {
+    controlsEl.classList.add('visible');
+  }
+
+  let scores = { messi: 0, ronaldo: 0 };
+  let spinning = false;
+  let currentRotation = 0;
+  let soundOn = true;
+
+  // ------------------------------------------------------------------
+  // MATCH / SERIES TRACKING — first player to TARGET_SCORE points wins
+  // the match; the running series tally persists across matches.
+  // ------------------------------------------------------------------
+  const TARGET_SCORE = 50;
+  let matchWins = { ronaldo: 0, messi: 0 };
+  let extraHoldMs = 0; // extra pause before the next auto-spin, used to let celebrations play out
+
+  // ------------------------------------------------------------------
+  // STREAK TRACKING — 3+ consecutive scores by the same player triggers
+  // an "ON FIRE" callout. Only scoring segments count toward a streak;
+  // hype-only segments (Subscribe/CR7/LM10) don't break or extend it.
+  // ------------------------------------------------------------------
+  let streakKey = null;
+  let streakCount = 0;
+
+  // ------------------------------------------------------------------
+  // WHEEL SEGMENTS — single source of truth for colors, labels & odds.
+  // 'score'  segments increment the scoreboard when landed on.
+  // 'hype'   segments never touch the scoreboard — they're just for fun.
+  // ------------------------------------------------------------------
+  const SEGMENTS = [
+    { key:'ronaldo',   label:'RONALDO',       type:'score', c1:'#a91f17', c2:'#e6362a', text:'#ffffff' },
+    { key:'subscribe', label:'SUBSCRIBE NOW', type:'hype',  c1:'#f2b705', c2:'#ffdf85', text:'#0a1410' },
+    { key:'messi',     label:'MESSI',         type:'score', c1:'#3f7fbd', c2:'#6cb4ee', text:'#ffffff' },
+    // CR7: bonus hype segment for Ronaldo's fans. Landing here NEVER awards a scoreboard point.
+    { key:'cr7',       label:'CR7',           type:'hype',  c1:'#3a0a08', c2:'#8a241c', text:'#ffd9d5' },
+    // LM10: bonus hype segment for Messi's fans. Landing here NEVER awards a scoreboard point.
+    { key:'lm10',      label:'LM10',          type:'hype',  c1:'#082226', c2:'#12657c', text:'#c9f3ff' },
+  ];
+  const SEG_COUNT = SEGMENTS.length;
+  const SEG_ANGLE = 360 / SEG_COUNT;
+
+  function buildWheel(){
+    // Build one conic-gradient for all colored slices (works for any number of segments).
+    const stops = [];
+    SEGMENTS.forEach((s, i) => {
+      const start = i * SEG_ANGLE, mid = start + SEG_ANGLE / 2, end = start + SEG_ANGLE;
+      stops.push(`${s.c1} ${start}deg`, `${s.c2} ${mid}deg`, `${s.c1} ${end}deg`);
+    });
+    wheel.style.background = `conic-gradient(from 0deg, ${stops.join(',')})`;
+
+    // Place one label per segment, rotated to the middle angle of its slice.
+    SEGMENTS.forEach((s, i) => {
+      s.centerAngle = i * SEG_ANGLE + SEG_ANGLE / 2;
+      const label = document.createElement('div');
+      label.className = 'wheel-label';
+      label.style.transform = `rotate(${s.centerAngle}deg)`;
+      const span = document.createElement('span');
+      span.textContent = s.label;
+      span.style.color = s.text;
+      // Every label stays on ONE line (no wrapping at all — see .wheel-label
+      // span { white-space: nowrap } in the CSS). A wrapped second line would
+      // sit closer to the wheel's center, where the wedge is narrower, and
+      // drift visually into the neighboring segment. Instead we just shrink
+      // the font enough for the full label (e.g. "SUBSCRIBE NOW") to fit on
+      // its single row near the rim, where the wedge is at its widest.
+      const len = s.label.length;
+      let fontSize;
+      if (len > 11)      fontSize = '1.5cqh';   // e.g. SUBSCRIBE NOW
+      else if (len > 8)  fontSize = '1.85cqh';
+      else if (len > 6)  fontSize = '2.15cqh';   // e.g. RONALDO
+      else                fontSize = '2.5cqh';    // e.g. MESSI, CR7, LM10
+      span.style.fontSize = fontSize;
+      label.appendChild(span);
+      wheel.appendChild(label);
+    });
+  }
+  buildWheel();
+
+  // ---- Floodlight bulb ring ----
+  const BULB_COUNT = 22;
+  const bulbs = [];
+  for(let i=0;i<BULB_COUNT;i++){
+    const b = document.createElement('div');
+    b.className = 'bulb';
+    bulbRing.appendChild(b);
+    bulbs.push(b);
+  }
+  function sizeBulbs(){
+    const r = bulbRing.getBoundingClientRect().width/2;
+    bulbs.forEach((b,i)=>{
+      const angle = (360/BULB_COUNT) * i;
+      b.style.transform = `rotate(${angle}deg) translate(-1px, -${r}px)`;
+    });
+  }
+  window.addEventListener('resize', sizeBulbs);
+  setTimeout(sizeBulbs, 50);
+
+  let bulbTimer = null;
+  function animateBulbs(on){
+    if(bulbTimer) clearInterval(bulbTimer);
+    if(!on){ bulbs.forEach(b=>b.classList.remove('lit')); return; }
+    let idx = 0;
+    bulbTimer = setInterval(()=>{
+      bulbs.forEach((b,i)=> b.classList.toggle('lit', i % 3 === idx % 3));
+      idx++;
+    }, 110); // gentle chase speed, matched to the slower overall pacing
+  }
+
+  // ---- Web Audio (no external files needed) ----
+  let actx;
+  function getCtx(){
+    if(!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+    return actx;
+  }
+  function tick(){
+    if(!soundOn) return;
+    try{
+      const ctx = getCtx();
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.type = 'square';
+      o.frequency.value = 900;
+      g.gain.value = 0.045;
+      o.connect(g); g.connect(ctx.destination);
+      o.start();
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
+      o.stop(ctx.currentTime + 0.07);
+    }catch(e){ /* audio can be blocked before any user interaction — fail silently */ }
+  }
+  function chime(freqs){
+    if(!soundOn) return;
+    try{
+      const ctx = getCtx();
+      freqs.forEach((f,i)=>{
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.type = 'triangle';
+        o.frequency.value = f;
+        g.gain.value = 0.0001;
+        o.connect(g); g.connect(ctx.destination);
+        const start = ctx.currentTime + i*0.12;
+        o.start(start);
+        g.gain.exponentialRampToValueAtTime(0.09, start + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.0001, start + 0.35);
+        o.stop(start + 0.4);
+      });
+    }catch(e){ /* fail silently */ }
+  }
+
+  soundBtn.addEventListener('click', ()=>{
+    soundOn = !soundOn;
+    soundBtn.textContent = soundOn ? '🔊 Sound On' : '🔇 Sound Off';
+  });
+
+  // ------------------------------------------------------------------
+  // FULLY RANDOM OUTCOME — every segment has an equal chance, matching
+  // the equal-sized slices on the wheel. Live chat votes (liveVotes,
+  // shown in the "Votes:" status text) no longer bias the spin — they're
+  // purely informational now, so the result is genuinely fair/random.
+  // ------------------------------------------------------------------
+  let liveVotes = { ronaldo: 50, messi: 50 }; // percentages — shown in the vote status text only
+
+  function pickOutcome(){
+    return SEGMENTS[Math.floor(Math.random() * SEG_COUNT)];
+  }
+
+  // ---- Live commenter feed + "top commenter" spotlight (from chat_vote_server.py) ----
+  let latestTopCommenter = null;
+  let lastTickerKey = '';
+
+  function updateCommentTicker(names){
+    if (!names || names.length === 0) return;
+    const key = names.join('|');
+    if (key === lastTickerKey) return; // avoid restarting the scroll for identical data
+    lastTickerKey = key;
+    commentTickerTrack.textContent = names.map(n => `💬 ${n}`).join('    •    ');
+    // Restart the CSS scroll animation so new names read from the start.
+    commentTickerTrack.style.animation = 'none';
+    void commentTickerTrack.offsetWidth;
+    commentTickerTrack.style.animation = '';
+  }
+
+  function showTopCommenterSpotlight(){
+    if (!latestTopCommenter) return; // nothing to show yet this window
+    tcName.textContent = latestTopCommenter.name;
+    const c = latestTopCommenter.count;
+    tcCount.textContent = `${c} comment${c === 1 ? '' : 's'} in the last 2 minutes`;
+    topCommenterOverlay.classList.add('show');
+    setTimeout(()=> topCommenterOverlay.classList.remove('show'), 4200);
+  }
+  // Every 2 minutes, spotlight whoever has commented the most recently.
+  setInterval(showTopCommenterSpotlight, 120000);
+
+  // ---- WebSocket connection to chat_vote_server.py ----
+  const WS_URL = 'ws://localhost:8765';
+  let ws;
+  function connectWS(){
+    try{
+      ws = new WebSocket(WS_URL);
+      ws.onmessage = (evt) => {
+        try{
+          const data = JSON.parse(evt.data);
+          if (typeof data.ronaldo_pct === 'number' && typeof data.messi_pct === 'number'){
+            liveVotes.ronaldo = data.ronaldo_pct;
+            liveVotes.messi = data.messi_pct;
+            wsStatus.textContent = `Votes: CR7 ${data.ronaldo_pct}% · LM10 ${data.messi_pct}%`;
+          }
+          if (Array.isArray(data.recent_commenters)){
+            updateCommentTicker(data.recent_commenters);
+          }
+          if (data.top_commenter && typeof data.top_commenter.name === 'string'){
+            latestTopCommenter = data.top_commenter;
+          }
+        }catch(e){ /* ignore malformed payloads */ }
+      };
+      ws.onclose = () => setTimeout(connectWS, 3000); // silent auto-reconnect, no visible error to viewers
+      ws.onerror = () => { try{ ws.close(); }catch(e){} };
+    }catch(e){
+      setTimeout(connectWS, 3000);
+    }
+  }
+  connectWS();
+
+  // ------------------------------------------------------------------
+  // SPIN MECHANICS — ~8 second spin: a tiny wind-up, then a long,
+  // smooth deceleration so the stop feels natural rather than abrupt.
+  // The wheel is always rotated so the pointer lands precisely inside
+  // the chosen segment, which is what determines the outcome.
+  // ------------------------------------------------------------------
+  const SPIN_DURATION_MS = 8000;
+  const WIND_UP_MS = 180;
+  const RESULT_HOLD_MS = 2600;
+  const GAP_BEFORE_NEXT_SPIN_MS = 2600;
+  const AUTO_SPIN = true; // set to false if you ever want to drive it manually via ?controls=1
+
+  function spin(){
+    if(spinning) return;
+    spinning = true;
+    spinBtn.disabled = true;
+    clearResult();
+    subCallout.classList.remove('show');
+
+    const target = pickOutcome();
+
+    // Small anticipatory wind-up (rotate back slightly) before the real spin — a small physical touch.
+    wheel.style.transition = `transform ${WIND_UP_MS}ms ease-in`;
+    wheel.style.transform = `rotate(${currentRotation - 6}deg)`;
+
+    requestAnimationFrame(()=>{
+      setTimeout(()=>{
+        animateBulbs(true);
+        const tickTimer = setInterval(tick, 130);
+
+        const extraSpins = 7 + Math.floor(Math.random()*2); // 7-8 full turns over 8 seconds
+        const randomJitter = (Math.random()*24) - 12; // land a little off-center within the slice, never outside it
+        const targetAngleWithinWheel = 360 - target.centerAngle + randomJitter;
+        const finalRotation = currentRotation - (currentRotation % 360) + extraSpins*360 + targetAngleWithinWheel;
+
+        currentRotation = finalRotation;
+        wheel.style.transition = `transform ${SPIN_DURATION_MS}ms cubic-bezier(0.14,0.66,0.14,1)`;
+        wheel.style.transform = `rotate(${finalRotation}deg)`;
+
+        setTimeout(()=>{
+          clearInterval(tickTimer);
+          animateBulbs(false);
+          spinning = false;
+          spinBtn.disabled = false;
+          handleOutcome(target);
+
+          if (AUTO_SPIN){
+            setTimeout(spin, RESULT_HOLD_MS + GAP_BEFORE_NEXT_SPIN_MS + extraHoldMs);
+            extraHoldMs = 0;
+          }
+        }, SPIN_DURATION_MS);
+      }, WIND_UP_MS);
+    });
+  }
+
+  function clearResult(){
+    resultOverlay.innerHTML = '';
+    resultOverlay.classList.remove('dim');
+    cardEls.messi.classList.remove('winning');
+    cardEls.ronaldo.classList.remove('winning');
+  }
+
+  function showResultText(text, className, subtext){
+    const el = document.createElement('div');
+    el.className = `result-text ${className}`;
+
+    const main = document.createElement('div');
+    main.className = 'result-main';
+    main.textContent = text;
+    el.appendChild(main);
+
+    if (subtext){
+      const sub = document.createElement('div');
+      sub.className = 'result-sub-line';
+      sub.textContent = subtext;
+      el.appendChild(sub);
+    }
+
+    resultOverlay.appendChild(el);
+    requestAnimationFrame(()=>{
+      el.classList.add('show');
+      resultOverlay.classList.add('dim'); // dim the background while the popup is up
+    });
+    setTimeout(()=>{
+      el.classList.add('result-fade');
+      resultOverlay.classList.remove('dim'); // lift the dim as the popup fades out
+      setTimeout(()=> el.remove(), 600);
+    }, RESULT_HOLD_MS);
+  }
+
+  function bumpScore(key){
+    scores[key] += 1;
+    const el = scoreEls[key];
+    el.textContent = scores[key];
+    el.classList.remove('bump');
+    void el.offsetWidth;
+    el.classList.add('bump');
+    cardEls[key].classList.add('winning');
+
+    // ---- streak tracking (visual-only "on fire" callout) ----
+    if (streakKey === key){
+      streakCount++;
+    } else {
+      streakKey = key;
+      streakCount = 1;
+    }
+    if (streakCount >= 3){
+      showStreak(key);
+    }
+
+    // ---- match win check ----
+    if (scores[key] >= TARGET_SCORE){
+      celebrateMatchWin(key);
+      return true; // signals handleOutcome that a match just ended
+    }
+    return false;
+  }
+
+  function updateSeriesBar(){
+    seriesRonaldoEl.textContent = matchWins.ronaldo;
+    seriesMessiEl.textContent = matchWins.messi;
+  }
+
+  function showStreak(key){
+    const label = key === 'ronaldo' ? 'CR7 IS ON FIRE! 🔥' : 'MESSI IS ON FIRE! 🔥';
+    streakText.textContent = label;
+    streakOverlay.classList.remove('show');
+    void streakOverlay.offsetWidth; // restart animation if it's already mid-flight
+    streakOverlay.classList.add('show');
+  }
+
+  function celebrateMatchWin(key){
+    matchWins[key] += 1;
+    updateSeriesBar();
+
+    const name = key === 'ronaldo' ? 'RONALDO' : 'MESSI';
+    winTitle.textContent = `${name} WINS THE MATCH!`;
+    winTitle.className = `win-title ${key}-win`;
+    winSub.textContent = `First to ${TARGET_SCORE} points`;
+
+    matchWinOverlay.classList.add('show');
+    burstConfetti(key === 'ronaldo' ? '#e6362a' : '#6cb4ee');
+    setTimeout(()=> burstConfetti('#f2b705'), 350);
+    setTimeout(()=> burstConfetti(key === 'ronaldo' ? '#e6362a' : '#6cb4ee'), 700);
+
+    // Re-trigger the bright flash pulse in case a previous celebration left it mid-animation.
+    winFlash.style.animation = 'none';
+    void winFlash.offsetWidth;
+    winFlash.style.animation = '';
+
+    const CELEBRATION_MS = 4200;
+    setTimeout(()=>{
+      matchWinOverlay.classList.remove('show');
+      // Reset for the next match in the series.
+      scores = { messi: 0, ronaldo: 0 };
+      scoreEls.messi.textContent = 0;
+      scoreEls.ronaldo.textContent = 0;
+      cardEls.messi.classList.remove('winning');
+      cardEls.ronaldo.classList.remove('winning');
+      streakKey = null;
+      streakCount = 0;
+    }, CELEBRATION_MS);
+
+    // Give the celebration time to play before the wheel spins again.
+    extraHoldMs = CELEBRATION_MS;
+  }
+
+  function triggerSubscribeHype(){
+    subHypeOverlay.classList.add('show');
+    setTimeout(()=> subHypeOverlay.classList.remove('show'), 3400);
+  }
+
+  function handleOutcome(segment){
+    const key = segment.key;
+
+    if (key === 'ronaldo'){
+      // Pointer stopped inside Ronaldo's slice -> Ronaldo gets the point.
+      const matchWon = bumpScore('ronaldo');
+      if (!matchWon){
+        showResultText('RONALDO SCORES!', 'result-ronaldo');
+      }
+      chime([392,494,659]);
+      burstConfetti('#e6362a');
+
+    } else if (key === 'messi'){
+      // Pointer stopped inside Messi's slice -> Messi gets the point.
+      const matchWon = bumpScore('messi');
+      if (!matchWon){
+        showResultText('MESSI SCORES!', 'result-messi');
+      }
+      chime([392,494,659]);
+      burstConfetti('#6cb4ee');
+
+    } else if (key === 'subscribe'){
+      showResultText('SUBSCRIBE NOW!', 'result-sub');
+      chime([523,659,784,1046]);
+      burstConfetti('#f2b705');
+      subCallout.classList.add('show');
+      setTimeout(()=> subCallout.classList.remove('show'), 4200);
+      triggerSubscribeHype();
+
+    } else if (key === 'cr7'){
+      // CR7 bonus segment: hypes up Ronaldo's fans but the scoreboard is untouched.
+      showResultText('CR7!', 'result-cr7', 'Ronaldo fan zone — no point awarded');
+      chime([440,554,659]);
+      burstConfetti('#ff6a5b');
+
+    } else if (key === 'lm10'){
+      // LM10 bonus segment: hypes up Messi's fans but the scoreboard is untouched.
+      showResultText('LM10!', 'result-lm10', 'Messi fan zone — no point awarded');
+      chime([440,554,659]);
+      burstConfetti('#5be3ff');
+    }
+  }
+
+  spinBtn.addEventListener('click', spin);
+
+  resetBtn.addEventListener('click', ()=>{
+    scores = { messi:0, ronaldo:0 };
+    scoreEls.messi.textContent = 0;
+    scoreEls.ronaldo.textContent = 0;
+    clearResult();
+    streakKey = null;
+    streakCount = 0;
+    streakOverlay.classList.remove('show');
+  });
+
+  // ---- Confetti, scoped to the 9:16 frame ----
+  const canvas = document.getElementById('confetti');
+  const ctx2d = canvas.getContext('2d');
+  function resizeCanvas(){
+    const r = frame.getBoundingClientRect();
+    canvas.width = r.width;
+    canvas.height = r.height;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  setTimeout(resizeCanvas, 50);
+
+  let particles = [];
+  function burstConfetti(color){
+    const colors = [color, '#ffffff', '#f2b705'];
+    for(let i=0;i<80;i++){
+      particles.push({
+        x: canvas.width/2 + (Math.random()-0.5)*canvas.width*0.5,
+        y: canvas.height*0.3,
+        vx: (Math.random()-0.5)*8,
+        vy: Math.random()*-8 - 3,
+        size: Math.random()*canvas.width*0.018+canvas.width*0.01,
+        rot: Math.random()*360,
+        vr: (Math.random()-0.5)*14,
+        color: colors[Math.floor(Math.random()*colors.length)],
+        life: 0,
+        maxLife: 100 + Math.random()*40
+      });
+    }
+  }
+  function loop(){
+    ctx2d.clearRect(0,0,canvas.width,canvas.height);
+    particles.forEach(p=>{
+      p.vy += 0.18;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.rot += p.vr;
+      p.life++;
+      ctx2d.save();
+      ctx2d.translate(p.x,p.y);
+      ctx2d.rotate(p.rot*Math.PI/180);
+      ctx2d.globalAlpha = Math.max(0, 1 - p.life/p.maxLife);
+      ctx2d.fillStyle = p.color;
+      ctx2d.fillRect(-p.size/2,-p.size/4,p.size,p.size/2);
+      ctx2d.restore();
+    });
+    particles = particles.filter(p=> p.life < p.maxLife);
+    requestAnimationFrame(loop);
+  }
+  loop();
+
+  // ------------------------------------------------------------------
+  // AUTOPLAY — starts on its own shortly after load and keeps looping
+  // for the rest of the stream. No click required.
+  // ------------------------------------------------------------------
+  if (AUTO_SPIN){
+    setTimeout(spin, 3000);
+  }
+
+})();
+</script>
+
+</body>
+</html>
