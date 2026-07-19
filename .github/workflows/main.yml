@@ -1,35 +1,44 @@
-name: Daily YouTube Vertical Live
+name: Live Stream Bot
 
 on:
-  schedule:
-    # ලංකාවේ වෙලාවෙන් දවල් 1:30 ට (UTC 08:00)
-    - cron: '0 8 * * *'
-  workflow_dispatch: 
+  workflow_dispatch: # GitHub එකෙන් manual ස්ටාර්ට් කරන්න පුළුවන් වෙන්න
 
 jobs:
-  live-stream:
+  stream:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Install FFmpeg & gdown
-        run: |
-          sudo apt update
-          sudo apt install ffmpeg -y
-          pip install gdown --break-system-packages
+    - name: Checkout Code
+      uses: actions/checkout@v3
 
-      - name: Download Video from Google Drive
-        run: |
-          # අලුත් වීඩියෝ ID එක මෙතැනට ඇතුළත් කර ඇත
-          gdown 1xDRUXeBooigi16GgJZLu3CK2wMmxfa6y -O video.mp4
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
 
-      - name: Start Streaming to YouTube (6 Hours)
-        env:
-          STREAM_KEY: ${{ secrets.YOUTUBE_STREAM_KEY }}
-        run: |
-          # -t 21600 මගින් හරියටම පැය 6ක් (60*60*6) ස්ට්‍රීම් කරයි
-          # -stream_loop -1 මගින් වීඩියෝව ඉවර වූ සැනින් නැවත මුල සිට පටන් ගනී (Loop)
-          ffmpeg -re -stream_loop -1 -i video.mp4 \
-            -vf "scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920" \
-            -c:v libx264 -preset veryfast -tune zerolatency -b:v 3000k -g 60 \
-            -c:a aac -b:a 128k -ar 44100 \
-            -t 21600 \
-            -f flv "rtmp://a.rtmp.youtube.com/live2/$STREAM_KEY"
+    - name: Install Dependencies
+      run: |
+        pip install pytchat websockets
+        sudo apt-get update
+        sudo apt-get install -y xvfb ffmpeg chromium-browser
+
+    - name: Start Services and Stream
+      run: |
+        # 1. HTML ෆයිල් එක තියෙන තැන (Localhost:8000) පුංචි වෙබ් සර්වර් එකක් ස්ටාර්ට් කරනවා
+        python -m http.server 8000 &
+        
+        # 2. ඔයාගේ පයිතන් චැට් සර්වර් එක බැක්ග්‍රවුන්ඩ් එකේ රන් කරනවා
+        python chat_vote_server.py --video-id ${{ secrets.YOUTUBE_VIDEO_ID }} &
+        
+        # 3. වර්චුවල් ඩිස්ප්ලේ එකක් හදනවා (:99 කියන screen id එකෙන්)
+        Xvfb :99 -screen 0 1080x1920x24 &
+        export DISPLAY=:99
+        
+        # පොඩි විරාමයක් දෙනවා සර්වර්ස් ටික active වෙනකන්
+        sleep 3
+        
+        # 4. වර්චුවල් මොනිටරය ඇතුළේ බ්‍රවුසර් එකෙන් අපේ index.html එක open කරනවා
+        chromium-browser --no-sandbox --window-size=1080,1920 http://localhost:8000/index.html &
+        
+        # 5. FFmpeg එකෙන් ඒ වර්චුවල් ස්ක්‍රීන් එක කැප්චර් කරලා YouTube එකට තල්ලු කරනවා
+        ffmpeg -f x11grab -video_size 1080x1920 -i :99.0+0,0 -f flv rtmps://a.rtmp.youtube.com/live2/${{ secrets.YOUTUBE_STREAM_KEY }}
